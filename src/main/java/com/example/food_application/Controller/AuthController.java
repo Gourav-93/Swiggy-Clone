@@ -1,43 +1,55 @@
 package com.example.food_application.Controller;
 
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.food_application.Entity.User;
 import com.example.food_application.Repository.UserRepository;
 
 @RestController
-@CrossOrigin("*")
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
     // REGISTER
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Email already exists");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
         user.setRole("USER");
-        return userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userRepository.save(user));
     }
 
-    // LOGIN (Ye Simple Login Hai, JWT Nahi Hai Abhi)
+    // LOGIN
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-
+    public ResponseEntity<?> login(@RequestBody User user) {
         Optional<User> existing = userRepository.findByEmail(user.getEmail());
 
         if (existing.isPresent()) {
-            if (existing.get().getPassword().equals(user.getPassword())) {
-                return "LOGIN SUCCESS (JWT will come next step)";
+            User found = existing.get();
+            if (found.getPassword().equals(user.getPassword())) {
+                // Validate Role
+                if (user.getRole() != null && !found.getRole().equalsIgnoreCase(user.getRole())) {
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "Incorrect role selected for this account");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+                }
+                return ResponseEntity.ok(found);
             }
         }
 
-        return "INVALID CREDENTIALS";
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Invalid email or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }

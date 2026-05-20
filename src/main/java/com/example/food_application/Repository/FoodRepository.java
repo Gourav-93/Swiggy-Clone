@@ -13,4 +13,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     // Type se Filter Krne Ke Liye
     List<Food> findByType(String type);
 
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT f.type FROM Food f")
+    List<String> findDistinctType();
+
 }

@@ -3,6 +3,8 @@ package com.example.food_application.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,77 +13,76 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.food_application.Entity.Food;
 import com.example.food_application.Repository.FoodRepository;
 
 @RestController
-@CrossOrigin("*")
-@RequestMapping("/api")
+@RequestMapping("/api/foods")
 public class FoodController {
 
     @Autowired
     private FoodRepository foodRepository;
 
-    // Bass Ek Food Ke Liye
-    @PostMapping("/foods")
-    public Food addFood(@RequestBody Food food) {
-        return foodRepository.save(food);
+    @PostMapping
+    public ResponseEntity<Food> addFood(@RequestBody Food food) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(foodRepository.save(food));
     }
 
-    // Ek Sath Sabhi Food Ke Liye
-    @PostMapping("/foods/bulk")
-    public List<Food> addFoods(@RequestBody List<Food> foods) {
-        return foodRepository.saveAll(foods);
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Food>> addFoods(@RequestBody List<Food> foods) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(foodRepository.saveAll(foods));
     }
 
-    // Sare Food Ko Dakhne Ke Liye
-    @GetMapping("/foods")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<Food> getAllFoods() {
         return foodRepository.findAll();
     }
 
-    // ID se Dakhne Ke Liye
-    @GetMapping("/foods/{id}")
-    public Food getById(@PathVariable Long id) {
-        return foodRepository.findById(id).orElse(null);
+    @GetMapping("/{id}")
+    public ResponseEntity<Food> getById(@PathVariable Long id) {
+        return foodRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // Name se Dakhne Ke Liye
-    @GetMapping("/foods/search/{name}")
+    @GetMapping("/search/{name}")
     public List<Food> search(@PathVariable String name) {
         return foodRepository.findByNameContaining(name);
     }
 
-    // Filter Krne Ke Liye Type Se
-    @GetMapping("/foods/type/{type}")
+    @GetMapping("/type/{type}")
     public List<Food> filterByType(@PathVariable String type) {
         return foodRepository.findByType(type);
     }
 
-    // Food Update Krne Ke Liye
-    @PutMapping("/foods/{id}")
-    public Food update(@PathVariable Long id, @RequestBody Food food) {
-        Food existing = foodRepository.findById(id).orElse(null);
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getCategories() {
+        return ResponseEntity.ok(foodRepository.findDistinctType());
+    }
 
-        if (existing != null) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Food> update(@PathVariable Long id, @RequestBody Food food) {
+        return foodRepository.findById(id).map(existing -> {
             existing.setName(food.getName());
             existing.setDescription(food.getDescription());
             existing.setPrice(food.getPrice());
             existing.setImage(food.getImage());
             existing.setType(food.getType());
             existing.setRestaurant(food.getRestaurant());
-
-            return foodRepository.save(existing);
-        }
-        return null;
+            return ResponseEntity.ok(foodRepository.save(existing));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Food Delete Krne Ke Liye
-    @DeleteMapping("/foods/{id}")
-    public String delete(@PathVariable Long id) {
-        foodRepository.deleteById(id);
-        return "Deleted successfully";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        if (foodRepository.existsById(id)) {
+            foodRepository.deleteById(id);
+            return ResponseEntity.ok("Deleted successfully");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Food not found");
     }
 }

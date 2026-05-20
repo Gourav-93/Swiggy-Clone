@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Foodie - Discover the ultimate gourmet experience with lightning-fast delivery from top-rated restaurants.">
+    <meta name="theme-color" content="#050505">
+    <title>Foodie | Elite Gourmet Delivery</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Canvas for particle background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Ambient orbs -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+
+    <!-- Page transition overlay -->
+    <div id="page-transition"></div>
+
+    <!-- Toast notification container -->
+    <div id="toast-container"></div>
+
+    <!-- Premium Glassmorphic Header -->
+    <header id="main-header">
+        <div class="header-inner">
+            <a href="#" class="logo" id="logo-link" onclick="showSection('home')">
+                <div class="logo-icon"><i class="fas fa-utensils"></i></div>
+                <span>Foodie</span>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a class="nav-link" id="nav-home-link" onclick="showSection('home')" data-label="Home">Home</a></li>
+                    <li><a class="nav-link" id="nav-dashboard-link" onclick="handleDashboardRedirect()" data-label="Dashboard" style="display: none;">Dashboard</a></li>
+                    <li><a class="nav-link" id="nav-menu-link" onclick="showSection('home')" data-label="Menu">Menu</a></li>
+                    <li id="nav-admin-link" style="display: none;"><a class="nav-link" onclick="showSection('admin')" data-label="Admin">Admin</a></li>
+                    <li id="nav-login-wrapper"><a class="nav-link nav-cta" id="nav-login-btn" onclick="showSection('login')">Sign In</a></li>
+                    <li id="nav-user-profile" style="display: none;">
+                        <div class="user-chip">
+                            <div class="user-avatar"><i class="fas fa-crown"></i></div>
+                            <span id="user-display-name"></span>
+                            <button id="logout-btn" onclick="logout()" class="logout-btn"><i class="fas fa-power-off"></i></button>
+                        </div>
+                    </li>
+                    <li>
+                        <a id="cart-nav-btn" onclick="showSection('cart')" class="cart-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="cart-count" id="cart-count-badge" style="display:none;">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- Mobile Nav Drawer -->
+    <div class="mobile-nav" id="mobile-nav">
+        <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fas fa-times"></i></button>
+        <div class="mobile-nav-links" id="mobile-nav-links-container">
+            <a onclick="showSection('home'); closeMobileNav()">Home</a>
+            <a onclick="showSection('home'); closeMobileNav()">Menu</a>
+            <a onclick="showSection('cart'); closeMobileNav()">Cart</a>
+            <a onclick="showSection('login'); closeMobileNav()" id="mobile-login-link">Sign In</a>
+        </div>
+    </div>
+
+    <main id="main-content">
+        <!-- Home Section -->
+        <section id="home-section" class="section-page">
+            <div class="hero">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>Now Delivering in 25 min</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="title-line">Taste</span>
+                    <span class="title-line gradient-text">Excellence,</span>
+                    <span class="title-line">Delivered.</span>
+                </h1>
+                <p class="hero-sub">Embark on a culinary journey with the finest selections from our curated restaurant partners.</p>
+                <div class="search-container">
+                    <div class="search-icon"><i class="fas fa-search"></i></div>
+                    <input type="text" id="food-search-input" placeholder="What are you dreaming of today?" onkeyup="searchFood()">
+                    <button class="search-btn" onclick="searchFood()">Search</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-num" data-count="240">0</span><span class="stat-suffix">+</span>
+                        <span class="stat-label">Dishes</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-num" data-count="48">0</span><span class="stat-suffix">+</span>
+                        <span class="stat-label">Restaurants</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-num" data-count="25">0</span><span class="stat-suffix">min</span>
+                        <span class="stat-label">Avg Delivery</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="category-wrapper">
+                <div class="category-scroll" id="category-tabs-list">
+                    <div class="category-item active" onclick="filterByCategory('all')">
+                        <i class="fas fa-border-all"></i> All Delicacies
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title" id="main-menu-heading">Curated Menu</h2>
+                        <p id="results-count" class="results-count"></p>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('grid')" id="grid-view-btn"><i class="fas fa-th"></i></button>
+                        <button class="view-btn" onclick="setView('list')" id="list-view-btn"><i class="fas fa-list"></i></button>
+                    </div>
+                </div>
+                
+                <div class="food-grid" id="food-items-grid">
+                    <div class="loading-state">
+                        <div class="loader-ring"></div>
+                        <p>CURATING YOUR EXPERIENCE...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Auth Section -->
+        <section id="login-section" class="section-page auth-section" style="display: none;">
+            <div class="auth-bg-art">
+                <div class="auth-orb auth-orb-1"></div>
+                <div class="auth-orb auth-orb-2"></div>
+            </div>
+            <div class="auth-container">
+                <div class="auth-card" id="login-form-box">
+                    <div class="auth-logo"><i class="fas fa-utensils"></i></div>
+                    <h2>Welcome Back</h2>
+                    <p class="auth-subtitle">Sign in to your elite account</p>
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" id="login-email" required placeholder="name@example.com" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-role"><i class="fas fa-user-shield"></i> Select Role</label>
+                            <select id="login-role" required class="auth-select">
+                                <option value="USER">User / Gourmet Explorer</option>
+                                <option value="ADMIN">Admin / Console Controller</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password"><i class="fas fa-lock"></i> Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+                                <button type="button" class="toggle-pwd" onclick="togglePassword('login-password', this)"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <button type="submit" id="submit-login" class="auth-btn">
+                            <span>Authorize Access</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                    <p class="auth-switch">New here? <span onclick="toggleAuth('register')">Create an Account →</span></p>
+                </div>
+
+                <div class="auth-card" id="register-form-box" style="display: none;">
+                    <div class="auth-logo"><i class="fas fa-crown"></i></div>
+                    <h2>Join Foodie</h2>
+                    <p class="auth-subtitle">Create your elite membership</p>
+                    <form id="register-form" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="reg-name"><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" id="reg-name" required placeholder="Johnathan Doe" autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email"><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" id="reg-email" required placeholder="name@example.com" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password"><i class="fas fa-lock"></i> Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="reg-password" required placeholder="Min 8 characters" autocomplete="new-password">
+                                <button type="button" class="toggle-pwd" onclick="togglePassword('reg-password', this)"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="pwd-strength" id="pwd-strength"></div>
+                        </div>
+                        <button type="submit" id="submit-register" class="auth-btn">
+                            <span>Create Identity</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                    <p class="auth-switch">Already have access? <span onclick="toggleAuth('login')">Sign In →</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Dashboard Section -->
+        <section id="user-dashboard-section" class="section-page" style="display: none; padding-top: 130px; min-height: 90vh;">
+            <div class="container">
+                <div class="hero" style="padding: 40px 0;">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        <span>Personalized Selection</span>
+                    </div>
+                    <h2 class="section-title">Welcome Back, <span id="dashboard-user-name" class="gradient-text">Member</span></h2>
+                    <p class="hero-sub">Explore your curated gourmet menu and recent favorites.</p>
+                </div>
+
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">Explore Menu</h3>
+                        <p class="results-count">Exclusively for you</p>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('grid')"><i class="fas fa-th"></i></button>
+                    </div>
+                </div>
+
+                <div class="food-grid" id="user-food-grid">
+                    <!-- Dynamic user content -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin-section" class="section-page admin-dashboard-page" style="display: none; padding-top: 100px; min-height: 100vh;">
+            <div class="admin-container">
+                <aside class="admin-sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo-icon"><i class="fas fa-crown"></i></div>
+                        <span>Admin Console</span>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <a href="#" class="active" onclick="showAdminTab('inventory')"><i class="fas fa-box"></i> Inventory</a>
+                        <a href="#" onclick="showAdminTab('orders')"><i class="fas fa-shopping-cart"></i> Orders</a>
+                        <a href="#" onclick="showAdminTab('users')"><i class="fas fa-users"></i> Users</a>
+                        <a href="#" onclick="showAdminTab('analytics')"><i class="fas fa-chart-line"></i> Analytics</a>
+                    </nav>
+                    <div class="sidebar-footer">
+                        <button onclick="logout()" class="logout-btn"><i class="fas fa-power-off"></i> Sign Out</button>
+                    </div>
+                </aside>
+
+                <main class="admin-main-content">
+                    <div class="admin-header">
+                        <div class="header-info">
+                            <h2 class="admin-title">Inventory Management</h2>
+                            <p class="admin-subtitle">Add, edit, or remove dishes from the public menu</p>
+                        </div>
+                        <button class="auth-btn add-dish-btn" onclick="openAdminFoodModal()">
+                            <i class="fas fa-plus"></i> New Masterwork
+                        </button>
+                    </div>
+
+                    <div id="admin-inventory-tab" class="admin-tab-content">
+                        <div class="admin-table-wrapper reveal">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dish</th>
+                                        <th>Category</th>
+                                        <th>Restaurant</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-food-table-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="admin-orders-tab" class="admin-tab-content" style="display:none;">
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>Order Tracking</h3>
+                            <p>Live order management coming soon.</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart-section" class="section-page" style="display: none; padding-top: 130px; min-height: 90vh;">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Your Selection</h2>
+                        <p id="cart-item-count" class="results-count"></p>
+                    </div>
+                    <button class="back-btn" onclick="showSection('home')">
+                        <i class="fas fa-arrow-left"></i> Continue Browsing
+                    </button>
+                </div>
+                <div id="cart-items-container" style="margin-top: 4rem;"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="item-detail-modal">
+        <div class="modal-glass" id="modal-content-container"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-glow"></div>
+        <div class="footer-content container">
+            <div class="footer-section footer-brand">
+                <a href="#" class="logo footer-logo" onclick="showSection('home')">
+                    <div class="logo-icon"><i class="fas fa-utensils"></i></div>
+                    <span>Foodie</span>
+                </a>
+                <p>Elevating the art of culinary delivery. Experience the finest flavors from curated elite kitchens, delivered with precision and care.</p>
+                <div class="social-links">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a onclick="showSection('home')">Home Selection</a></li>
+                    <li><a onclick="showSection('home')">Gourmet Menu</a></li>
+                    <li><a onclick="showSection('cart')">Your Bag</a></li>
+                    <li><a href="#">Order Tracking</a></li>
+                    <li><a href="#">Elite Membership</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Concierge Service</a></li>
+                    <li><a href="#">FAQ & Help</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Protocol</a></li>
+                    <li><a href="#">Corporate Gifting</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Categories</h4>
+                <ul id="footer-category-links">
+                    <li><a onclick="filterByCategory('Italian'); showSection('home')">Italian</a></li>
+                    <li><a onclick="filterByCategory('Fast Food'); showSection('home')">Fast Food</a></li>
+                    <li><a onclick="filterByCategory('Indian'); showSection('home')">Indian</a></li>
+                    <li><a onclick="filterByCategory('Dessert'); showSection('home')">Dessert</a></li>
+                </ul>
+                <div class="footer-contact">
+                    <h5>Direct Line</h5>
+                    <p>concierge@foodie.elite</p>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 FOODIE ELITE GOURMET. ALL RIGHTS RESERVED.</p>
+            <div class="footer-badges">
+                <span><i class="fas fa-shield-alt"></i> SSL Secure</span>
+                <span><i class="fas fa-bolt"></i> Fast Delivery</span>
+                <span><i class="fas fa-star"></i> Premium Quality</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

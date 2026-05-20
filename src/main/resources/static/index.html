@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Foodie - Discover the ultimate gourmet experience with lightning-fast delivery from top-rated restaurants.">
+    <meta name="theme-color" content="#050505">
+    <title>Foodie | Elite Gourmet Delivery</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Premium Header -->
+    <header id="main-header">
+        <a href="#" class="logo" id="logo-link" onclick="showSection('home')">
+            <i class="fas fa-utensils"></i> Foodie
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a id="nav-home-link" onclick="showSection('home')">Home</a></li>
+                <li><a id="nav-menu-link" onclick="showSection('home')">Menu</a></li>
+                <li id="nav-login-wrapper"><a id="nav-login-btn" onclick="showSection('login')">Sign In</a></li>
+                <li id="nav-user-profile" style="display: none;">
+                    <span id="user-display-name" style="font-weight: 800; color: var(--text); margin-right: 15px;"></span>
+                    <a id="logout-btn" onclick="logout()" style="color: var(--danger);"><i class="fas fa-power-off"></i></a>
+                </li>
+                <li>
+                    <a id="cart-nav-btn" onclick="showSection('cart')" class="cart-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count" id="cart-count-badge">0</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home-section" class="fade-in">
+            <div class="hero">
+                <h1 class="slide-up">Taste Excellence, Delivered.</h1>
+                <p class="slide-up" style="animation-delay: 0.1s;">Embark on a culinary journey with the finest selections from our curated restaurant partners.</p>
+                <div class="search-container slide-up" style="animation-delay: 0.2s;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="food-search-input" placeholder="What are you dreaming of today?" onkeyup="searchFood()">
+                </div>
+            </div>
+
+            <div class="category-wrapper slide-up" style="animation-delay: 0.3s;">
+                <div class="category-scroll" id="category-tabs-list">
+                    <!-- Categories loaded dynamically -->
+                    <div class="category-item active" onclick="filterByCategory('all')">All Delicacies</div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="section-header slide-up" style="animation-delay: 0.4s;">
+                    <h2 class="section-title" id="main-menu-heading">Curated Menu</h2>
+                    <p id="results-count" style="color: var(--text-dim); font-weight: 600;"></p>
+                </div>
+                
+                <div class="food-grid" id="food-items-grid">
+                    <!-- Loading State -->
+                    <div class="loading-state" style="grid-column: 1/-1; text-align: center; padding: 10rem 0;">
+                         <div class="loading-spinner" style="margin: 0 auto 2rem;"></div>
+                         <p style="color: var(--text-muted); font-weight: 600; letter-spacing: 1px;">CURATING YOUR EXPERIENCE...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Auth Section -->
+        <section id="login-section" class="auth-section" style="display: none;">
+            <div class="auth-container fade-in">
+                <div class="auth-form" id="login-form-box">
+                    <h2>Welcome Back</h2>
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" required placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" id="submit-login" class="auth-btn">Authorize Access</button>
+                    </form>
+                    <p class="auth-switch">New here? <span onclick="toggleAuth('register')">Create an Account</span></p>
+                </div>
+
+                <div class="auth-form" id="register-form-box" style="display: none;">
+                    <h2>Join Foodie</h2>
+                    <form id="register-form" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name</label>
+                            <input type="text" id="reg-name" required placeholder="Johnathan Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Email Address</label>
+                            <input type="email" id="reg-email" required placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" id="submit-register" class="auth-btn">Create Identity</button>
+                    </form>
+                    <p class="auth-switch">Already have access? <span onclick="toggleAuth('login')">Sign In</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart-section" style="display: none; padding-top: 150px; min-height: 90vh;">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Your Selection</h2>
+                    <button class="add-btn" style="width: auto; height: auto; padding: 1rem 2rem; border-radius: 50px; font-size: 0.9rem; font-weight: 800;" onclick="showSection('home')">
+                        <i class="fas fa-arrow-left" style="margin-right: 10px;"></i> CONTINUE BROWSING
+                    </button>
+                </div>
+                <div id="cart-items-container" style="margin-top: 4rem;">
+                    <!-- Cart items loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal" id="item-detail-modal">
+        <div class="modal-content" id="modal-content-container">
+            <!-- Modal content loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Modern Premium Footer -->
+    <footer>
+        <div class="footer-content container">
+            <div class="footer-section">
+                <a href="#" class="logo" style="margin-bottom: 2rem; font-size: 2.5rem;"><i class="fas fa-utensils"></i> Foodie</a>
+                <p style="color: var(--text-dim); max-width: 320px; line-height: 1.8; margin-top: 1rem;">
+                    Elevating the art of culinary delivery. Experience the finest flavors from curated elite kitchens, delivered with precision and care.
+                </p>
+                <div class="social-links" style="margin-top: 2.5rem;">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a onclick="showSection('home')">Home Selection</a></li>
+                    <li><a onclick="showSection('home')">Gourmet Menu</a></li>
+                    <li><a onclick="showSection('cart')">Your Bag</a></li>
+                    <li><a href="#">Order Tracking</a></li>
+                    <li><a href="#">Elite Membership</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Concierge Service</a></li>
+                    <li><a href="#">FAQ & Help</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Protocol</a></li>
+                    <li><a href="#">Corporate Gifting</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Categories</h4>
+                <ul id="footer-category-links">
+                    <li><a onclick="filterByCategory('Italian')">Italian</a></li>
+                    <li><a onclick="filterByCategory('Fast Food')">Fast Food</a></li>
+                    <li><a onclick="filterByCategory('Indian')">Indian</a></li>
+                    <li><a onclick="filterByCategory('Dessert')">Dessert</a></li>
+                </ul>
+                <div style="margin-top: 3rem;">
+                    <h5 style="color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Direct Line</h5>
+                    <p style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">concierge@foodie.elite</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <p>&copy; 2026 FOODIE ELITE GOURMET. ALL RIGHTS RESERVED. CRAFTED FOR THE EXTRAORDINARY.</p>
+        </div>
+    </footer>
+
+    <!-- Core Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

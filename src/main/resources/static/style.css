@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* Core Colors - More Vibrant & Premium */
+    --primary: #ff7e2e;
+    --primary-rgb: 255, 126, 46;
+    --primary-dark: #e66a1f;
+    --accent: #ffb100;
+    
+    /* Dark Theme Palette - Deeper Blacks */
+    --bg: #050505;
+    --surface: #0a0a0a;
+    --surface-hover: #121212;
+    --card: #0f0f0f;
+    --card-hover: #161616;
+    
+    /* Text Colors */
+    --text: #ffffff;
+    --text-muted: #a1a1aa;
+    --text-dim: #71717a;
+    
+    /* Accents */
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    
+    /* Glassmorphism */
+    --glass: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-glow: rgba(255, 126, 46, 0.1);
+    
+    /* Borders & Shadow */
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    
+    /* Transitions */
+    --transition-fast: 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-base: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-slow: 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    
+    /* Sizing */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
+    --radius-xl: 48px;
+}
+
+/* --- Base Styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .logo {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* --- Premium Background Elements --- */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 10% 10%, rgba(255, 126, 46, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(255, 177, 0, 0.02) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* --- Typography --- */
+.hero h1 {
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 900;
+    margin-bottom: 2rem;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --- Food Card Redesign --- */
+.food-card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: var(--transition-base);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.food-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(var(--primary-rgb), 0.3);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7), 0 0 20px rgba(var(--primary-rgb), 0.1);
+}
+
+.card-img-wrapper {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    margin: 10px;
+    border-radius: 24px;
+}
+
+.food-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-slow);
+}
+
+.food-card:hover img {
+    transform: scale(1.1);
+}
+
+.card-tag {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.2rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.food-info {
+    padding: 2.5rem;
+    padding-top: 1rem;
+    flex-grow: 1;
+}
+
+.food-info h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.food-info p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    opacity: 0.8;
+}
+
+.food-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
+
+.add-btn {
+    width: 60px;
+    height: 60px;
+    background: var(--primary);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-size: 1.25rem;
+    box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.2);
+}
+
+.add-btn:hover {
+    background: var(--text);
+    color: var(--bg);
+    transform: scale(1.05) rotate(90deg);
+}
+
+/* --- Category Tabs --- */
+.category-item {
+    padding: 1.2rem 2.8rem;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-base);
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    backdrop-filter: blur(10px);
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    transform: translateY(-4px);
+}
+
+.category-item.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 15px 30px rgba(var(--primary-rgb), 0.3);
+}
+
+/* --- Modern Footer Redesign --- */
+footer {
+    padding: 120px 0 60px;
+    background: #020202;
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 6rem;
+    margin-bottom: 80px;
+}
+
+.footer-section h4 {
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.footer-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--primary);
+}
+
+.footer-section ul li {
+    margin-bottom: 1.2rem;
+}
+
+.footer-section ul li a {
+    color: var(--text-dim);
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.footer-section ul li a:hover {
+    color: var(--primary);
+    padding-left: 8px;
+}
+
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.social-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: var(--transition-base);
+}
+
+.social-icon:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-5px);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+}
+
+.footer-bottom p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+    .hero h1 { font-size: 3.5rem; }
+    .food-grid { grid-template-columns: 1fr; }
+}
+
+/* Reuse existing header and other utility styles but with updated tokens */
+header.scrolled {
+    background: rgba(5, 5, 5, 0.8);
+    backdrop-filter: blur(30px);
+}
+
+.search-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.search-container input::placeholder {
+    color: var(--text-dim);
+}

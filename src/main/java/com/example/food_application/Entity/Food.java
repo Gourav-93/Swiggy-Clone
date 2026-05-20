@@ -14,11 +14,20 @@ public class Food {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @jakarta.persistence.Column(nullable = false)
     private String name;
+
+    @jakarta.persistence.Column(nullable = false)
     private String description;
+
+    @jakarta.persistence.Column(nullable = false)
     private double price;
+
     private String image;
+
+    @jakarta.persistence.Column(nullable = false)
     private String type;
+
     private String restaurant;
 
     public Food(String name, String description, double price, String image, String type, String restaurant) {
