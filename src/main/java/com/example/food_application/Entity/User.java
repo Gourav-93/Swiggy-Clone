@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "userDB")
@@ -17,6 +20,14 @@ public class User {
     private String email;
     private String password;
     private String role;
+    private String phoneNumber;
+    private String profilePicture;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public User(String name, String email, String password, String role) {
         this.name = name;
@@ -47,6 +58,22 @@ public class User {
     public Long getId() {
         return id;
     }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -62,6 +89,22 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }

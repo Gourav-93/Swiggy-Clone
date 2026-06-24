@@ -29,6 +29,12 @@ public class Food {
     private String type;
 
     private String restaurant;
+    
+    private Double rating = 0.0;
+    
+    private Integer numReviews = 0;
+    
+    private boolean isVeg = true;
 
     public Food(String name, String description, double price, String image, String type, String restaurant) {
         this.name = name;
@@ -69,6 +75,18 @@ public class Food {
     public Long getId() {
         return id;
     }
+    
+    public Double getRating() {
+        return rating;
+    }
+    
+    public Integer getNumReviews() {
+        return numReviews;
+    }
+    
+    public boolean isVeg() {
+        return isVeg;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -96,6 +114,18 @@ public class Food {
 
     public void setRestaurant(String restaurant) {
         this.restaurant = restaurant;
+    }
+    
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+    
+    public void setNumReviews(Integer numReviews) {
+        this.numReviews = numReviews;
+    }
+    
+    public void setVeg(boolean isVeg) {
+        this.isVeg = isVeg;
     }
 
 }

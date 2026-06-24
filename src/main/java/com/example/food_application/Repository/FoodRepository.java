@@ -1,19 +1,24 @@
 package com.example.food_application.Repository;
 
+import com.example.food_application.Entity.Food;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+@Repository
+public interface FoodRepository extends JpaRepository<Food, Long>, JpaSpecificationExecutor<Food> {
 
-import com.example.food_application.Entity.Food;
+    List<Food> findTop10ByOrderByRatingDesc();
 
-public interface FoodRepository extends JpaRepository<Food, Long> {
-    // Name se Dakhne Ke Liye
+    List<Food> findTop10ByOrderByNumReviewsDesc();
+
     List<Food> findByNameContaining(String name);
 
-    // Type se Filter Krne Ke Liye
     List<Food> findByType(String type);
 
-    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT f.type FROM Food f")
+    @Query("SELECT DISTINCT f.type FROM Food f WHERE f.type IS NOT NULL")
     List<String> findDistinctType();
-
 }

@@ -6,6 +6,19 @@
 // ========== API CONFIGURATION ==========
 const API_BASE = 'http://localhost:8080/api';
 
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    let [resource, config] = arguments;
+    if (typeof resource === 'string' && resource.includes(API_BASE) && !resource.includes('/auth/') && !resource.includes('/foods')) {
+        config = config || {};
+        config.headers = config.headers || {};
+        if (state.currentUser && state.currentUser.token) {
+            config.headers['Authorization'] = `Bearer ${state.currentUser.token}`;
+        }
+    }
+    return originalFetch(resource, config);
+};
+
 // ========== STATE ==========
 const state = {
     currentUser: (() => { try { return JSON.parse(localStorage.getItem('user')) || null; } catch { return null; } })(),
@@ -46,6 +59,84 @@ function bindDom() {
     dom.navDashboardLink = document.getElementById('nav-dashboard-link');
     dom.dashboardUserName = document.getElementById('dashboard-user-name');
 }
+
+// API Endpoints
+const apiEndpoints = {
+    profile: '/api/profile',
+    address: '/api/address',
+    adminDashboard: '/api/admin/dashboard/stats',
+    foods: '/api/foods',
+    tracking: '/api/orders/track/'
+};
+
+// State
+let currentToken = localStorage.getItem('token');
+
+// Utils
+function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+}
+
+async function fetchAPI(url, method = 'GET', body = null) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (currentToken) headers['Authorization'] = 'Bearer ' + currentToken;
+    
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+    
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+// Features
+async function loadProfile() {
+    try {
+        const profile = await fetchAPI(apiEndpoints.profile);
+        document.getElementById('profile-name').innerText = profile.name;
+        document.getElementById('profile-phone').innerText = profile.phoneNumber || 'N/A';
+    } catch(e) { console.error('Failed to load profile', e); }
+}
+
+async function loadAddresses() {
+    try {
+        const addresses = await fetchAPI(apiEndpoints.address);
+        const list = document.getElementById('address-list');
+        list.innerHTML = '';
+        addresses.forEach(a => {
+            list.innerHTML += `<div class="card"><p>${a.street}, ${a.city}</p></div>`;
+        });
+    } catch(e) { console.error('Failed to load addresses', e); }
+}
+
+async function loadDashboard() {
+    try {
+        const stats = await fetchAPI(apiEndpoints.adminDashboard);
+        document.getElementById('stat-revenue').innerText = '$' + stats.totalRevenue;
+        document.getElementById('stat-orders').innerText = stats.totalOrders;
+    } catch(e) { console.error('Failed to load dashboard', e); }
+}
+
+async function trackOrder() {
+    const id = document.getElementById('order-id').value;
+    if(!id) return;
+    try {
+        const status = await fetchAPI(apiEndpoints.tracking + id);
+        document.getElementById('order-status').innerText = 'Status: ' + status;
+    } catch(e) {
+        document.getElementById('order-status').innerText = 'Order not found';
+    }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', async () => {
+    if(currentToken) {
+        await loadProfile();
+        await loadAddresses();
+        await loadDashboard();
+    }
+});
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded', async () => {
@@ -338,7 +429,9 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password, role })
         });
         if (res.ok) {
-            const user = await res.json();
+            const data = await res.json();
+            const user = data.user;
+            user.token = data.token;
             state.currentUser = user;
             localStorage.setItem('user', JSON.stringify(user));
             showNotification(`Welcome back, ${user.role}!`, 'success', 'Access Granted');
@@ -615,19 +708,30 @@ async function filterByCategory(category) {
 }
 
 // ========== WISHLIST ==========
-function toggleWishlist(foodId, el) {
-    const idx = state.wishlist.indexOf(foodId);
-    if (idx === -1) {
-        state.wishlist.push(foodId);
-        el.classList.add('active');
-        el.innerHTML = '<i class="fas fa-heart"></i>';
-        showNotification('Added to your wishlist.', 'info', 'Saved');
-    } else {
-        state.wishlist.splice(idx, 1);
-        el.classList.remove('active');
-        el.innerHTML = '<i class="far fa-heart"></i>';
+async function toggleWishlist(foodId, el) {
+    if (!state.currentUser) {
+        showNotification('Sign in to manage your wishlist.', 'error', 'Login Required');
+        showSection('login');
+        return;
     }
-    localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
+    const idx = state.wishlist.indexOf(foodId);
+    try {
+        if (idx === -1) {
+            await fetch(`${API_BASE}/wishlist/user/${state.currentUser.id}/food/${foodId}`, { method: 'POST' });
+            state.wishlist.push(foodId);
+            el.classList.add('active');
+            el.innerHTML = '<i class="fas fa-heart"></i>';
+            showNotification('Added to your wishlist.', 'info', 'Saved');
+        } else {
+            await fetch(`${API_BASE}/wishlist/user/${state.currentUser.id}/food/${foodId}`, { method: 'DELETE' });
+            state.wishlist.splice(idx, 1);
+            el.classList.remove('active');
+            el.innerHTML = '<i class="far fa-heart"></i>';
+        }
+        localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
+    } catch (err) {
+        showNotification('Failed to update wishlist.', 'error');
+    }
 }
 
 // ========== CART ==========
